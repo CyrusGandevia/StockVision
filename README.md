@@ -45,7 +45,7 @@ As we can see, despite a few outliers, NVIDIA generally performs better (has a b
 ### Machine-Learning Based Stock Prediction:
 (Disclaimer: by no means is this a tool that can be realistically applied to the market, and it should not be used as a reference when trading on the stock market. This was purely made with the intention to try my hand in machine learning and apply it to a financial application.)
 
-Lastly, let's say I am curious to see how NVIDIA may perform 10 days in the future from August 31st, 2020. The script uses machine-learning based regression models (Linear Regression, Quadratic Regression and k-Nearest Neighbor) to train the prediction algorithm based off past data, and then make a prediction for how the stocks will fair in the future. 
+Lastly, let's say I am curious to see how NVIDIA may perform 10 days in the future from August 31st, 2020. The script uses <b>machine-learning based regression models (Linear Regression, Quadratic Regression and k-Nearest Neighbor)</b> to train the prediction algorithm based off past data, and then make a prediction for how the stocks will fair in the future. 
 
 Using the script's function, `predict_future_price`, let's see how it faired for NVIDIA:
 
@@ -65,7 +65,6 @@ It should be noted that the prediction data set was generated fully based off th
 
 All in all, a pretty good prediction with all things considered.
 
-<br>
 
 Want to try it out yourself?
 ------------
