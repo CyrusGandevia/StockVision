@@ -57,7 +57,7 @@ Looking at the actual graph of NVIDIA's stocks from September 1st to September 1
 
 <img src="https://i.imgur.com/8gu44uT.png" height="200" width="356">
 
-Although the prediction's shape doesn't entirely mimic this trend, if we look closer at it, we see that the shape of the predicted line does quite a decent job of matching the general trend of the stock price from September 1st to September 10th. 
+Although the prediction's shape doesn't entirely mimic this trend, if we look closer at it, we see that the shape of the predicted line (blue line) does quite a decent job of matching the general trend of the stock price from September 1st to September 10th. 
 
 <img src="https://i.imgur.com/1cgUnCr.png" height="200" width="356">
 
