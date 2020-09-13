@@ -153,7 +153,6 @@ def predict_future_price(df, forecast_out, prediction_model, end_string):
         forecast = clf_knn.predict(X_forecast)
 
 
-
     # Displaying Data on Graph
     last_date = df.iloc[-1].name
     last_unix = last_date
