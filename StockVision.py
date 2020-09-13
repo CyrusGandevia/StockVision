@@ -78,18 +78,19 @@ def display_correlation_analysis(company, competitor, start, end, start_string, 
 
     competitor_df = web.DataReader([company, competitor], financial_source, start=start, end=end)['Adj Close']
     returns_comp = competitor_df.pct_change()
-    correlation = returns_comp.corr()
     mpl.rc('figure', figsize=(15, 10))
     plt.scatter(returns_comp[company], returns_comp[competitor])
     plt.title(title)
     plt.xlabel(company + " Return Rate")
     plt.ylabel(competitor + " Return Rate")
     plt.show()
+
+    #correlation = returns_comp.corr()
     #print (correlation)
 
 
 # Using machine learning models to predict future stock prices based on current, given data
-def predict_future_price(df, future_days, prediction_model, test_size=0.25):
+def predict_future_price(df, forecast_out, prediction_model, end_string):
 
     # -- Pre-processing and Training --
     df = df.loc[:, ['Adj Close']]  # Using Adj. Close values for our prediction
@@ -97,20 +98,20 @@ def predict_future_price(df, future_days, prediction_model, test_size=0.25):
     # Creating a new column in dataframe (called 'prediction') which will be the label (a.k.a. output)
     # Filling label column with output data to be trained upon (but shifted 'forecast_duration' days up)
     # This allows for the missing units due to the up shift to be filled with the predicted scores (the result)
-    df['prediction'] = df[['Adj Close']].shift(-future_days)
+    df['prediction'] = df[['Adj Close']].shift(-forecast_out)
 
     # X represents the array of Adj. Close values, so prediction column must be dropped
     X = np.array(df.drop(['prediction'], 1))
-    # X = preprocessing.scale(X)  # Normalize the data for models
+    X = preprocessing.scale(X)  # Normalize the data for models
 
     # Moving the NaN values to the forecast array since the true forecast data is yet to be populated
-    # X_forecast = X[-(forecast_out):]
-    # X = X[:-forecast_out] # Removing the NaN values from X
+    X_forecast = X[-forecast_out:]
+    X = X[:-forecast_out] # Removing the NaN values from X
 
     # Defining Output (equate it to the prediction dataframe column, and remove the days that don't have any pricing
     # data yet. These are the days that will be filled by the forecast
-    Y = np.array(df['prediction'])[:-future_days]
-    # Y = Y[:-forecast_out]
+    Y = np.array(df['prediction'])
+    Y = Y[:-forecast_out]
 
 
     # -- Model Generation, Training and Evaluation --
@@ -129,7 +130,7 @@ def predict_future_price(df, future_days, prediction_model, test_size=0.25):
     clf_quad_3.fit(X_train, Y_train)
 
     # k-Nearest Neighbor Regression Model:
-    clf_knn = KNeighborsRegressor(n_neighbors=20, weights='distance')
+    clf_knn = KNeighborsRegressor(n_neighbors=5, weights='distance')
     clf_knn.fit(X_train, Y_train)
 
     # Confidence Score (Coefficient of Determination - compares predicted price with actual price)
@@ -137,10 +138,6 @@ def predict_future_price(df, future_days, prediction_model, test_size=0.25):
     confidence_quad_2 = clf_quad_2.score(X_test, Y_test)
     confidence_quad_3 = clf_quad_3.score(X_test, Y_test)
     confidence_knn = clf_knn.score(X_test, Y_test)
-
-    X_forecast = df.drop(['prediction'], 1)[:-future_days]
-    X_forecast = X_forecast.tail(future_days)
-    X_forecast = np.array(X_forecast)
 
     if (prediction_model == "Linear Regression"):
         confidence_lin_reg = clf_lin_reg.score(X_test, Y_test)
@@ -155,16 +152,29 @@ def predict_future_price(df, future_days, prediction_model, test_size=0.25):
         confidence_knn = clf_knn.score(X_test, Y_test)
         forecast = clf_knn.predict(X_forecast)
 
-   # Plotting the Graph
-    outcome = df[X.shape[0]:]
-    outcome['prediction'] = forecast
-    mpl.rc('figure', figsize=(15, 10))
-    style.use('ggplot')
-    plt.title("test")
-    plt.plot(df['Adj Close'])
-    plt.plot(outcome['Adj Close'])
-    #plt.legend(['Org', 'Valid', 'Predicted'])
+
+
+    # Displaying Data on Graph
+    last_date = df.iloc[-1].name
+    last_unix = last_date
+    next_unix = last_unix + datetime.timedelta(days=1)
+
+    for i in forecast:
+        next_date = next_unix
+        next_unix += datetime.timedelta(days=1)
+        df.loc[next_date] = [np.nan for _ in
+                             range(len(df.columns) - 1)] + [i]
+
+    df['Adj Close'].tail(500).plot()
+    df['prediction'].tail(forecast_out).plot()
+    plt.legend(loc=4)
+    plt.xlabel('Date')
+    plt.ylabel('Closing Price (USD)')
+    plt.legend(['Closing Price', 'Predicted Closing Price'])
+    title = "[" + company + "] -" + " Projected Stock Price for: Next " + str(forecast_out) + " Days beyond " + end_string
+    plt.title(title)
     plt.show()
+
 
 
 if __name__ == "__main__":
@@ -172,9 +182,8 @@ if __name__ == "__main__":
     competitor = 'AMD'
     start_string = "2015-01-01"
     end_string = "2020-08-31"
-    forecast_duration = 30  # In terms of days
+    forecast_duration = 10  # In terms of days
     prediction_models = ["Linear Regression", "Quadratic Regression 1", "Quadratic Regression 2", "k-Nearest Neighbor"]
-    test_size = 0.25
 
     start, end = set_data_range(start_string, end_string)
     df = set_tracked_company(company, start, end)
@@ -182,4 +191,4 @@ if __name__ == "__main__":
     display_return_deviation(df, company, start_string, end_string)
     display_correlation_analysis(company, competitor, start, end, start_string, end_string)
 
-    predict_future_price(df, forecast_duration, prediction_models[0], test_size=test_size)
+    predict_future_price(df, forecast_duration, prediction_models[3], end_string)
