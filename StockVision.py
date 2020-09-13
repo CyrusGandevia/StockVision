@@ -113,7 +113,6 @@ def predict_future_price(df, forecast_out, prediction_model, end_string):
     Y = np.array(df['prediction'])
     Y = Y[:-forecast_out]
 
-
     # -- Model Generation, Training and Evaluation --
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.25)
 
