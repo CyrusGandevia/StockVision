@@ -89,3 +89,7 @@ Then you can any of run the following methods:
 - `display_return_deviation`
 - `display_correlation_analysis`
 - `predict_future_price`
+
+Credits
+------------
+Shoutout to Vincent Tatan for providing direction and inspiration for this project!
